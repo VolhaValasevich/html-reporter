@@ -6,6 +6,10 @@ const reportHeader = `<!DOCTYPE html>
 <html>
   <head>
     <title>Cucumber Feature Report</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <style type="text/css">
      body {
     font: 16px Calibri, Courier, monospace;
@@ -39,7 +43,7 @@ h1, h2, h3, h4, p {
     padding: 5px;
     display: block;
 }
-.container {
+.block {
     background: #f8f8f8;
     border-radius: 5px;
     border: 1px solid #e8e8e8;
@@ -98,24 +102,25 @@ function processSteps(steps) {
             fs.writeFileSync(screenshotPath, image, 'base64');
             result += result + `<a href='${screenshotPath}'><img src='${screenshotPath}' class="screenshot"></a>`;
         }
-        if (typeof(step.result.duration) === 'number') {
+        if (typeof step.result.duration === 'number') {
             scenarioDuration += step.result.duration;
         }
     });
     return {result: result, duration: scenarioDuration} ;
 }
 
-function processElements(elements) {
+function processElements(elements, featureIndex) {
     let result = '';
     let elementIndex = 0;
     let featureDuration = 0;
     elements.forEach((element) => {
         elementIndex += 1;
         const steps = processSteps(element.steps);
-        result += `<div class="element container">
-        <h3 class="title"><span class="highlight">Scenario ${elementIndex}: </span>${element.name}
+        result += `<div class="element block">
+        <h3 class="title" type="button" data-toggle="collapse" data-target="#feature${featureIndex}scenario${elementIndex}">
+        <span class="highlight">Scenario ${elementIndex}: </span>${element.name}
         <span class="step-duration">${formatDuration(steps.duration)}</span></h3>
-        ${steps.result}</div>`;
+        <div id="feature${featureIndex}scenario${elementIndex}" class="collapse">${steps.result}</div></div>`;
         featureDuration += steps.duration;
     });
     return {result: result, duration: featureDuration};
@@ -126,12 +131,13 @@ function processFeatures(features) {
     let featureIndex = 0;
     let totalDuration = 0;
     features.forEach((feature) => {
-        const scenarios = processElements(feature.elements);
+        const scenarios = processElements(feature.elements, featureIndex);
         featureIndex += 1;
-        result += `<div class="feature container">
-        <h3 class="title"><span class="highlight">Feature ${featureIndex}: </span>${feature.name}
-        <span class="step-duration">${formatDuration(scenarios.duration)}</span></h3></h3>
-        ${scenarios.result}</div>`;
+        result += `<div class="feature block">
+        <h3 class="title" type="button" data-toggle="collapse" data-target="#feature${featureIndex}">
+        <span class="highlight">Feature ${featureIndex}: </span>${feature.name}
+        <span class="step-duration">${formatDuration(scenarios.duration)}</span></h3>
+        <div id="feature${featureIndex}" class="collapse">${scenarios.result}</div></div>`;
         totalDuration += scenarios.duration;
     });
     return {result: result, duration: totalDuration, number: featureIndex};
