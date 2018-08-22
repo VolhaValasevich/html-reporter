@@ -31,8 +31,18 @@ h1, h2, h3, h4, p {
 .skipped {
 	background-color: #ffff80;
 }
-.step-duration {
+.float-right {
     float: right;
+}
+.header {
+    background-color: #d9d9d9;
+    font: 20px Arial, Courier, monospace;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+.header-text {
+    font: 50px Calibri, Courier, monospace;
 }
 .step {
     margin: 10px;
@@ -63,6 +73,16 @@ const reportEnd = `</body></html>`;
 
 const reportData = JSON.parse(fs.readFileSync(path));
 
+let statistics = {
+    passed: 0,
+    failed: 0,
+    skipped: 0,
+    featureNum: 0,
+    scenarioNum: 0,
+    testNum: 0,
+    totalDuration: 0
+};
+
 function formatDuration(duration) {
     let result = '';
     if (typeof (duration) === 'number') {
@@ -88,9 +108,11 @@ function processSteps(steps, scenarioIndex) {
     let scenarioDuration = 0;
     steps.forEach((step, stepIndex) => {
         if (step.keyword !== 'After') {
+            statistics.testNum += 1;
+            statistics[step.result.status] += 1;
             result += `<div class="step"><p><span class="text ${step.result.status}">    
             <span class="keyword highlight"> ${step.keyword} </span> ${step.name} 
-            <span class="step-duration">${formatDuration(step.result.duration)}</span></span></p></div>`;
+            <span class="float-right">${formatDuration(step.result.duration)}</span></span></p></div>`;
         }
         if (step.embeddings !== undefined) {
             let image = new Buffer.from(step.embeddings[0].data, 'base64');
@@ -118,7 +140,7 @@ function processElements(elements, featureIndex) {
         result += `<div class="element block">
         <h3 class="title" type="button" data-toggle="collapse" data-target="#feature${featureIndex}scenario${scenarioIndex}">
         <span class="highlight">Scenario ${scenarioIndex}: </span>${scenario.name}
-        <span class="step-duration">${formatDuration(steps.duration)}</span></h3>
+        <span class="float-right">${formatDuration(steps.duration)}</span></h3>
         <div id="feature${featureIndex}scenario${scenarioIndex}" class="collapse">${steps.result}</div></div>`;
         featureDuration += steps.duration;
     });
@@ -131,17 +153,26 @@ function processFeatures(features) {
     let totalDuration = 0;
     features.forEach((feature) => {
         const scenarios = processElements(feature.elements, featureIndex);
+        statistics.scenarioNum += feature.elements.length;
+        statistics.featureNum += 1;
         featureIndex += 1;
         result += `<div class="feature block">
         <h3 class="title" type="button" data-toggle="collapse" data-target="#feature${featureIndex}">
         <span class="highlight">Feature ${featureIndex}: </span>${feature.name}
-        <span class="step-duration">${formatDuration(scenarios.duration)}</span></h3>
+        <span class="float-right">${formatDuration(scenarios.duration)}</span></h3>
         <div id="feature${featureIndex}" class="collapse">${scenarios.result}</div></div>`;
         totalDuration += scenarios.duration;
     });
-    return {result: result, duration: totalDuration, number: featureIndex};
+    return {result: result, duration: totalDuration};
 }
 
 const reportBody = processFeatures(reportData);
-const report = reportHeader + reportBody.result + reportEnd;
+statistics.totalDuration += reportBody.duration;
+const headerPanel = `<div class="header"><span class="highlight header-text">Test results: </span><div class="float-right">
+    <div><span class="passed">${statistics.passed} passed</span>
+    <span class="failed">${statistics.failed} failed</span>
+    <span class="skipped">${statistics.skipped} skipped</span>
+    </div> <div><span>${statistics.featureNum} features, ${statistics.scenarioNum} scenarios, ${statistics.testNum} steps</span>
+    </div><div><span>${formatDuration(statistics.totalDuration)}</span></div></div></div>`;
+const report = reportHeader + headerPanel + reportBody.result + reportEnd;
 fs.writeFileSync('report.html', report.toString(), 'utf8');
