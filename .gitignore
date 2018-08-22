@@ -2,6 +2,7 @@
 .npmrc
 reports/
 node_modules/
+screenshots/
 report.json
 *.log
 *.html
