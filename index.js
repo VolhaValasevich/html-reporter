@@ -83,13 +83,12 @@ function formatDuration(duration) {
     return result;
 }
 
-function processSteps(steps) {
+function processSteps(steps, scenarioIndex) {
     let result = '';
     let scenarioDuration = 0;
-    steps.forEach((step) => {
+    steps.forEach((step, stepIndex) => {
         if (step.keyword !== 'After') {
-            result += `<div class="step"><p> 
-            <span class="text ${step.result.status}">    
+            result += `<div class="step"><p><span class="text ${step.result.status}">    
             <span class="keyword highlight"> ${step.keyword} </span> ${step.name} 
             <span class="step-duration">${formatDuration(step.result.duration)}</span></span></p></div>`;
         }
@@ -98,9 +97,9 @@ function processSteps(steps) {
             if (!fs.existsSync('screenshots')) {
                 fs.mkdirSync('screenshots');
             }
-            let screenshotPath = './screenshots/' + step.duration + '.png';
+            let screenshotPath = `./screenshots/Scenario${scenarioIndex}Step${stepIndex}.png`;
             fs.writeFileSync(screenshotPath, image, 'base64');
-            result += result + `<a href='${screenshotPath}'><img src='${screenshotPath}' class="screenshot"></a>`;
+            result += result + `<a href='${screenshotPath}' target="_blank"><img src='${screenshotPath}' class="screenshot"></a>`;
         }
         if (typeof step.result.duration === 'number') {
             scenarioDuration += step.result.duration;
@@ -111,16 +110,16 @@ function processSteps(steps) {
 
 function processElements(elements, featureIndex) {
     let result = '';
-    let elementIndex = 0;
+    let scenarioIndex = 0;
     let featureDuration = 0;
-    elements.forEach((element) => {
-        elementIndex += 1;
-        const steps = processSteps(element.steps);
+    elements.forEach((scenario) => {
+        scenarioIndex += 1;
+        const steps = processSteps(scenario.steps, scenarioIndex);
         result += `<div class="element block">
-        <h3 class="title" type="button" data-toggle="collapse" data-target="#feature${featureIndex}scenario${elementIndex}">
-        <span class="highlight">Scenario ${elementIndex}: </span>${element.name}
+        <h3 class="title" type="button" data-toggle="collapse" data-target="#feature${featureIndex}scenario${scenarioIndex}">
+        <span class="highlight">Scenario ${scenarioIndex}: </span>${scenario.name}
         <span class="step-duration">${formatDuration(steps.duration)}</span></h3>
-        <div id="feature${featureIndex}scenario${elementIndex}" class="collapse">${steps.result}</div></div>`;
+        <div id="feature${featureIndex}scenario${scenarioIndex}" class="collapse">${steps.result}</div></div>`;
         featureDuration += steps.duration;
     });
     return {result: result, duration: featureDuration};
