@@ -1,0 +1,7 @@
+.idea/
+.npmrc
+reports/
+node_modules/
+report.json
+*.log
+*.html
