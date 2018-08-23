@@ -20,19 +20,10 @@ let statistics = {
 function formatDuration(duration) {
     let result = '';
     if (typeof (duration) === 'number') {
-        result += 'Duration:';
-        let milliseconds = duration;
-        let seconds = Math.floor(milliseconds / 1000);
-        let minutes = Math.floor(seconds / 60);
-        if (minutes > 0) {
-            result += ` ${minutes}m`;
-            seconds -= (minutes * 60);
-        }
-        if (seconds > 0) {
-            result += ` ${seconds}s`;
-            milliseconds -= (seconds * 1000);
-        }
-        result += ` ${milliseconds}ms`;
+        const minutes = Math.floor(duration / 60000);
+        const seconds = Math.floor((duration % 60000) / 1000);
+        const milliseconds = duration % 1000;
+        result = `Duration: ${minutes}m ${seconds}s ${milliseconds}ms`;
     }
     return result;
 }
