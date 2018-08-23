@@ -27,18 +27,28 @@ h1, h2, h3, h4, p {
 .skipped {
 	background-color: #ffff80;
 }
+.light-grey {
+    background-color: #f8f8f8;
+}
+
+.dark-grey {
+    background-color: #cccccc; 
+}
 .float-right {
     float: right;
 }
-.header {
-    background-color: #d9d9d9;
-    font: 20px Arial, Courier, monospace;
-    border-radius: 5px;
-    padding: 20px;
+.clickable {
+    cursor: pointer;
 }
-
+.header {
+    background-color: #4d4d4d;
+    font: 20px Arial, Courier, monospace;
+    padding: 20px;
+    height: 120px;
+}
 .header-text {
     font: 50px Calibri, Courier, monospace;
+    color: white;
 }
 .step {
     margin: 10px;
@@ -50,9 +60,11 @@ h1, h2, h3, h4, p {
     display: block;
 }
 .block {
-    background: #f8f8f8;
+    padding: 10px;
+    margin: auto;
+}
+.inner-block {
     border-radius: 5px;
-    border: 1px solid #e8e8e8;
     padding: 10px;
     margin: 10px;
 }

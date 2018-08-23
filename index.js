@@ -55,7 +55,7 @@ function processSteps(steps, scenarioIndex) {
             }
             let screenshotPath = `./screenshots/Scenario${scenarioIndex}Step${stepIndex}.png`;
             fs.writeFileSync(screenshotPath, image, 'base64');
-            result += `<a href='${screenshotPath}' target="_blank"><img src='${screenshotPath}' class="screenshot"></a>`;
+            result += `<a href='${screenshotPath}' target="_blank"><img src='${screenshotPath}' class="screenshot clickable"></a>`;
         }
         if (typeof step.result.duration === 'number') {
             scenarioDuration += step.result.duration;
@@ -71,8 +71,8 @@ function processElements(elements, featureIndex) {
     elements.forEach((scenario) => {
         scenarioIndex += 1;
         const steps = processSteps(scenario.steps, scenarioIndex);
-        result += `<div class="element block">
-        <h3 class="title" type="button" data-toggle="collapse" data-target="#feature${featureIndex}scenario${scenarioIndex}">
+        result += `<div class="element inner-block light-grey">
+        <h3 class="title clickable" type="button" data-toggle="collapse" data-target="#feature${featureIndex}scenario${scenarioIndex}">
         <span class="highlight">Scenario ${scenarioIndex}: </span>${scenario.name}
         <span class="float-right">${formatDuration(steps.duration)}</span></h3>
         <div id="feature${featureIndex}scenario${scenarioIndex}" class="collapse">${steps.result}</div></div>`;
@@ -90,8 +90,8 @@ function processFeatures(features) {
         statistics.scenarioNum += feature.elements.length;
         statistics.featureNum += 1;
         featureIndex += 1;
-        result += `<div class="feature block">
-        <h3 class="title" type="button" data-toggle="collapse" data-target="#feature${featureIndex}">
+        result += `<div class="feature block dark-grey">
+        <h3 class="title clickable" type="button" data-toggle="collapse" data-target="#feature${featureIndex}">
         <span class="highlight">Feature ${featureIndex}: </span>${feature.name}
         <span class="float-right">${formatDuration(scenarios.duration)}</span></h3>
         <div id="feature${featureIndex}" class="collapse">${scenarios.result}</div></div>`;
@@ -103,10 +103,10 @@ function processFeatures(features) {
 const reportBody = processFeatures(reportData);
 statistics.totalDuration += reportBody.duration;
 const headerPanel = `<div class="header"><span class="highlight header-text">Test results: </span><div class="float-right">
-    <div><span class="passed">${statistics.passed} passed</span>
-    <span class="failed">${statistics.failed} failed</span>
-    <span class="skipped">${statistics.skipped} skipped</span>
-    </div> <div><span>${statistics.featureNum} features, ${statistics.scenarioNum} scenarios, ${statistics.testNum} steps</span>
-    </div><div><span>${formatDuration(statistics.totalDuration)}</span></div></div></div>`;
+    <div><span class="passed block">${statistics.passed} passed</span>
+    <span class="failed block">${statistics.failed} failed</span>
+    <span class="skipped block">${statistics.skipped} skipped</span>
+    </div><div class="block" style="color:white"> <div><span>${statistics.featureNum} features, ${statistics.scenarioNum} scenarios, ${statistics.testNum} steps</span>
+    </div><div><span>${formatDuration(statistics.totalDuration)}</span></div></div></div></div>`;
 const report = reportHeader + headerPanel + reportBody.result + reportEnd;
 fs.writeFileSync('report.html', report.toString(), 'utf8');
