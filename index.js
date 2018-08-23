@@ -55,13 +55,13 @@ function processSteps(steps, scenarioIndex) {
             }
             let screenshotPath = `./screenshots/Scenario${scenarioIndex}Step${stepIndex}.png`;
             fs.writeFileSync(screenshotPath, image, 'base64');
-            result += result + `<a href='${screenshotPath}' target="_blank"><img src='${screenshotPath}' class="screenshot"></a>`;
+            result += `<a href='${screenshotPath}' target="_blank"><img src='${screenshotPath}' class="screenshot"></a>`;
         }
         if (typeof step.result.duration === 'number') {
             scenarioDuration += step.result.duration;
         }
     });
-    return {result: result, duration: scenarioDuration} ;
+    return { result: result, duration: scenarioDuration };
 }
 
 function processElements(elements, featureIndex) {
@@ -78,7 +78,7 @@ function processElements(elements, featureIndex) {
         <div id="feature${featureIndex}scenario${scenarioIndex}" class="collapse">${steps.result}</div></div>`;
         featureDuration += steps.duration;
     });
-    return {result: result, duration: featureDuration};
+    return { result: result, duration: featureDuration };
 }
 
 function processFeatures(features) {
@@ -97,7 +97,7 @@ function processFeatures(features) {
         <div id="feature${featureIndex}" class="collapse">${scenarios.result}</div></div>`;
         totalDuration += scenarios.duration;
     });
-    return {result: result, duration: totalDuration};
+    return { result: result, duration: totalDuration };
 }
 
 const reportBody = processFeatures(reportData);
